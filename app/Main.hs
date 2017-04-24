@@ -14,7 +14,7 @@ import Control.Monad(forever, forM_, void)
 import Data.Monoid
 import Data.Maybe(fromMaybe, isJust)
 import Options.Applicative
-import System.FSNotify (withManagerConf, watchDirChan, WatchConfig(..), Debounce(..))
+import System.FSNotify (withManagerConf, watchTreeChan, WatchConfig(..), Debounce(..))
 
 deriving instance Show Debounce
 
@@ -63,7 +63,7 @@ main = do
     events <- newChan
     thread <- newMVar =<< if initial then Just <$> forkIO (execCommands commands) else return Nothing
     withManagerConf conf $ \mgr -> do
-        forM_ directories $ \d -> watchDirChan mgr d (\_ -> True) events
+        forM_ directories $ \d -> watchTreeChan mgr d (\_ -> True) events
         forever $ do
             ev <- readChan events
             print ev
